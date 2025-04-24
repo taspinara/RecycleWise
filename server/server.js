@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
+ import eventRoutes from "./routes/eventRoutes.js";
+
 import connectDB from './config/db.js';
 
 dotenv.config();
@@ -21,6 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // Import Routes
+app.use('/api/events', eventRoutes);
 
 
 app.get(/.*/, (req, res) => {
