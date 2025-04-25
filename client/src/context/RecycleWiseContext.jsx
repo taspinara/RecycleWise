@@ -16,16 +16,9 @@ const RecycleWiseProvider = ({ children }) => {
     // const logout = () => setUser(null);
     // const isAuthenticated = !!user;
     // const isAdmin = user?.role === 'admin'; // Example of checking if the user is an admin
-
-    const navigateTo = (path) => {
-        navigate(path);
-    }
-
-    
     
     return (
         <RecycleWiseContext.Provider value={{ 
-        navigateTo,
         // isAuthenticated,
         // isAdmin,
         // login,
