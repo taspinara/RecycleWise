@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { RecycleWiseProvider } from './context/RecycleWiseContext'
+import Footer from './components/Footer'
+import Navbar from './components/Navbar'
 
 import Home from './pages/Home'
 import Login from './pages/Login';
@@ -10,6 +12,7 @@ import Register from './pages/Register';
 function App() {
 
   return (
+
     <Router>
       <RecycleWiseProvider>
         <Routes>
@@ -45,7 +48,7 @@ function App() {
         </Routes>
       </RecycleWiseProvider>
     </Router>
-  )
+	);
 }
 
 export default App
