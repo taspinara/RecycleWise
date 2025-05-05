@@ -1,37 +1,55 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from '../utils/api';
 
 const RecycleWiseContext = createContext();
 
-const useRecycleWise = () => useContext(RecycleWiseContext);
+export const useRecycleWise = () => useContext(RecycleWiseContext);
 
+export const RecycleWiseProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-const RecycleWiseProvider = ({ children }) => {
-    const navigate = useNavigate();
+  const fetchUser = async () => {
+    try {
+      const res = await apiFetch('/auth/me');
+      const data = await res.json();
+      if (res.ok) setUser(data);
+      else setUser(null);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Add any other state or functions you want to provide to your components
-    // For example, you might want to manage user authentication state, etc.
-    // const [user, setUser] = useState(null);
-    // const login = (userData) => setUser(userData);
-    // const logout = () => setUser(null);
-    // const isAuthenticated = !!user;
-    // const isAdmin = user?.role === 'admin'; // Example of checking if the user is an admin
-    
-    return (
-        <RecycleWiseContext.Provider value={{ 
-        // isAuthenticated,
-        // isAdmin,
-        // login,
-        // logout,
-        // user,
-        navigate,   
-        // Add any other context values you want to provide here
-         }}>
-        {children}
-        </RecycleWiseContext.Provider>
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
-    );
-}  
+  const logout = async () => {
+    await apiFetch('/auth/logout', { method: 'POST' });
+    setUser(null);
+    navigate('/login');
+  };
 
-export { RecycleWiseProvider, useRecycleWise };
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === "admin";
 
+  return (
+    <RecycleWiseContext.Provider
+      value={{
+        user,
+        setUser,
+        logout,
+        isAuthenticated,
+        isAdmin,
+        loading,
+        navigate,
+      }}
+    >
+      {!loading && children}
+    </RecycleWiseContext.Provider>
+  );
+};
