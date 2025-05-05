@@ -49,13 +49,13 @@ export const registerSchema = Joi.object({
       'string.min': 'Password must be at least 6 characters long.',
     }),
 
-  confirmPassword: Joi.any()
-    .valid(Joi.ref('password'))
-    .required()
-    .messages({
-      'any.only': 'Passwords do not match.',
-      'any.required': 'Please confirm your password.',
-    }),
+  // confirmPassword: Joi.any()
+  //   .valid(Joi.ref('password'))
+  //   .required()
+  //   .messages({
+  //     'any.only': 'Passwords do not match.',
+  //     'any.required': 'Please confirm your password.',
+  //   }),
 });
 
 export const loginSchema = Joi.object({
