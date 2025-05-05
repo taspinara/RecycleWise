@@ -3,6 +3,8 @@ import { RecycleWiseProvider } from './context/RecycleWiseContext'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
 
+import LeaderBoard from './pages/LeaderBoard'
+
 import Home from './pages/Home'
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -12,15 +14,27 @@ import Register from './pages/Register';
 function App() {
 
   return (
+		<Router>
+			<RecycleWiseProvider>
+				<Routes>
+					<Route
+						index
+						element={<Home />}
+					/>
+					<Route
+						path='/login'
+						element={<Login />}
+					/>
+					<Route
+						path='/register'
+						element={<Register />}
+					/>
+					<Route
+						path='/leaderboard'
+						element={<LeaderBoard />}
+					/>
 
-    <Router>
-      <RecycleWiseProvider>
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />  
-
-          {/* <Route
+					{/* <Route
             path="/service"
             element={
               <PrivateRoute>
@@ -28,7 +42,7 @@ function App() {
               </PrivateRoute>
             }
           /> */}
-          {/* <Route
+					{/* <Route
             path="/admin"
             element={
               <PrivateRoute>
@@ -36,7 +50,7 @@ function App() {
               </PrivateRoute>
             }
           /> */}
-          {/* <Route
+					{/* <Route
             path="/quiz"
             element={
               <PrivateRoute>
@@ -44,10 +58,10 @@ function App() {
               </PrivateRoute>
             }
           /> */}
-          {/* Add more routes as needed */}
-        </Routes>
-      </RecycleWiseProvider>
-    </Router>
+					{/* Add more routes as needed */}
+				</Routes>
+			</RecycleWiseProvider>
+		</Router>
 	);
 }
 
