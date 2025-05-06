@@ -46,6 +46,7 @@ const Login = () => {
 			const data = response.data;
 			localStorage.setItem("token", data.token); // Save token
 			setToken(data.token); // Update context state
+			
 			navigate("/"); // Redirect to home
 		} catch (err) {
 			setError(err.response?.data?.message || "Login failed");

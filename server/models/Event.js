@@ -23,8 +23,7 @@ const eventSchema = new mongoose.Schema({
     eventImage: {
         type: String,
         default:'https://res.cloudinary.com/dknaiynrj/image/upload/v1600671364/sample.jpg',
-        required: false,
-        trim: true,
+         trim: true,
     },
     eventOrganizer: {
         type: String,

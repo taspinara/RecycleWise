@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecycleWise } from "../context/RecycleWiseContext.jsx";
+import axios from "axios";
 
 const Admin = () => {
 	const [events, setEvents] = useState([]);
@@ -14,18 +15,28 @@ const Admin = () => {
 		eventStatus: "upcoming",
 	});
 	const [editingEventId, setEditingEventId] = useState(null);
+	const [loading, setLoading] = useState(true); // Loading state for fetching events
 
-	const { API_URL } = useRecycleWise();
+	const { API_BASE_URL, token } = useRecycleWise();
 
 	// Fetch events from the server
 	useEffect(() => {
 		const fetchEvents = async () => {
-			const response = await fetch(`${API_URL}/events`);
-			const data = await response.json();
-			setEvents(data);
+			try {
+				const response = await axios.get(`${API_BASE_URL}/events`);
+				if (response.status !== 200) {
+					throw new Error("Failed to fetch leaderboard data"); // Handle non-200 responses
+				}
+				// Check if the response is empty
+				console.log(response.data); // Log the response data for debugging
+				setEvents(response.data); // Set the events state with the fetched data
+				setLoading(false); // Stop loading
+			} catch (error) {
+				console.error("Error fetching events:", error);
+			}
 		};
 		fetchEvents();
-	}, []);
+	}, []); // Fetch events when the component mounts or when events change
 
 	// Handle form input changes
 	const handleInputChange = (e) => {
@@ -33,36 +44,20 @@ const Admin = () => {
 		setFormData({ ...formData, [name]: value });
 	};
 
-	// Function to send email
-	const sendEmail = async (eventData) => {
-		try {
-			const response = await fetch(`${API_URL}/send-email`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(eventData),
-			});
-			if (response.ok) {
-				alert("Email sent successfully!");
-			} else {
-				alert("Failed to send email.");
-			}
-		} catch (error) {
-			console.error("Error sending email:", error);
-			alert("An error occurred while sending the email.");
-		}
-	};
-
 	// Handle form submission for creating/updating events
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const method = editingEventId ? "PUT" : "POST";
 		const url = editingEventId
-			? `/api/events/${editingEventId}`
-			: "/api/events";
+			? `${API_BASE_URL}/events/${editingEventId}`
+			: `${API_BASE_URL}/events`;
 
 		const response = await fetch(url, {
 			method,
-			headers: { "Content-Type": "application/json" },
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
 			body: JSON.stringify(formData),
 		});
 
@@ -82,7 +77,6 @@ const Admin = () => {
 				eventDate: "",
 				eventLocation: "",
 				eventDescription: "",
-				eventImage: "",
 				eventOrganizer: "",
 				eventType: "",
 				eventStatus: "upcoming",
@@ -93,7 +87,12 @@ const Admin = () => {
 
 	// Handle delete event
 	const handleDelete = async (id) => {
-		const response = await fetch(`/api/events/${id}`, { method: "DELETE" });
+		const response = await fetch(`/api/events/${id}`, { method: "DELETE", 
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					}
+				});
 		if (response.ok) {
 			setEvents(events.filter((event) => event._id !== id));
 		}
@@ -213,38 +212,47 @@ const Admin = () => {
 						</tr>
 					</thead>
 					<tbody>
-						{events.map((event) => (
-							<tr key={event._id}>
-								<td className='border p-2'>{event.eventName}</td>
-								<td className='border p-2'>
-									{new Date(event.eventDate).toLocaleDateString()}
-								</td>
-								<td className='border p-2'>{event.eventLocation}</td>
-								<td className='border p-2'>{event.eventOrganizer}</td>
-								<td className='border p-2'>{event.eventType}</td>
-								<td className='border p-2'>{event.eventStatus}</td>
-								<td className='border p-2'>
-									<button
-										onClick={() => handleEdit(event)}
-										className='bg-yellow-500 text-black px-2 py-1 rounded mr-2 hover:bg-yellow-600'
-									>
-										Edit
-									</button>
-									<button
-										onClick={() => handleDelete(event._id)}
-										className='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600'
-									>
-										Delete
-									</button>
-									<button
-										onClick={() => sendEmail(event)}
-										className='bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600'
-									>
-										Send Email
-									</button>
+						{loading ? (
+							<tr>
+								<td
+									colSpan='7'
+									className='text-black text-center p-4'
+								>
+									No events found
 								</td>
 							</tr>
-						))}
+						) : (
+							events.map((event) => (
+								<tr key={event._id}>
+									<td className='text-black border p-2'>{event.eventName}</td>
+									<td className='text-black border p-2'>
+										{new Date(event.eventDate).toLocaleDateString()}
+									</td>
+									<td className='text-black border p-2'>
+										{event.eventLocation}
+									</td>
+									<td className='text-black border p-2'>
+										{event.eventOrganizer}
+									</td>
+									<td className='text-black border p-2'>{event.eventType}</td>
+									<td className='text-black border p-2'>{event.eventStatus}</td>
+									<td className='text-black border p-2'>
+										<button
+											onClick={() => handleEdit(event)}
+											className='bg-yellow-500 text-black px-2 py-1 rounded mr-2 hover:bg-yellow-600'
+										>
+											Edit
+										</button>
+										<button
+											onClick={() => handleDelete(event._id)}
+											className='bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600'
+										>
+											Delete
+										</button>
+									</td>
+								</tr>
+							))
+						)}
 					</tbody>
 				</table>
 			</div>

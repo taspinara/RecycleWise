@@ -1,13 +1,18 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import asyncHandler from '../utils/asyncHandler.js';
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import asyncHandler from "../utils/asyncHandler.js";
 
 const createToken = (user) => {
-  return jwt.sign(
-    { id: user._id, username: user.username, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-  );
+	return jwt.sign(
+		{
+			id: user._id,
+			username: user.username,
+			email: user.email,
+			role: user.role,
+		},
+		process.env.JWT_SECRET,
+		{ expiresIn: "1d" }
+	);
 };
 
 export const register = asyncHandler(async (req, res) => {
@@ -24,11 +29,10 @@ export const register = asyncHandler(async (req, res) => {
 	res.status(201).json({ token });
 });
 
-
 // Login a user
 export const login = asyncHandler(async (req, res) => {
 	const { email, password } = req.body;
-	
+
 	if (!email || !password) {
 		return res
 			.status(400)
@@ -43,12 +47,9 @@ export const login = asyncHandler(async (req, res) => {
 	res.status(200).json({ token });
 });
 
-
-
-
 export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie('token');
-  res.status(200).json({ message: 'Logout successful' });
+	res.clearCookie("token");
+	res.status(200).json({ message: "Logout successful" });
 });
 
 export const getCurrentUser = asyncHandler(async (req, res) => {
