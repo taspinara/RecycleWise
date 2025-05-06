@@ -11,7 +11,6 @@ const LeaderBoard = () => {
 
 	useEffect(() => {
 		const getList = async () => {
-      console.log(API_BASE_URL);
 			try {
 				const response = await axios.get(`${API_BASE_URL}/leaderboard`); // Fetch leaderboard data from the API
 				console.log(response); // Log the response data for debugging
@@ -21,7 +20,7 @@ const LeaderBoard = () => {
 			}
 		};
 		getList(); // Call the function to fetch data
-	}, [users]);
+	}, []);
 
 	return (
 		<>

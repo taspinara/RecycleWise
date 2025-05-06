@@ -60,7 +60,7 @@ function App() {
           /> */}
 					{/* Add more routes as needed */}
 				</Routes>
-			</RecycleWiseProvider>
+				</RecycleWiseProvider>
 		</Router>
 	);
 }
