@@ -1,9 +1,9 @@
 import OpenAI from "openai";
+import dotenv from "dotenv";
+dotenv.config();
 
 const openai = new OpenAI({
-  apiKey:
-    process.env.OPENAI_API_KEY ||
-    "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export const askQuestion = async (req, res) => {
