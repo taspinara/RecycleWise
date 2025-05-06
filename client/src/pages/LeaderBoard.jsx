@@ -3,40 +3,57 @@ import QuizModal from "../components/QuizModal";
 import { useRecycleWise } from "../context/RecycleWiseContext.jsx";
 import axios from "axios";
 
+const LeaderBoardRow = ({ rank, email, score }) => (
+	<div className='grid grid-cols-12 gap-4 items-center bg-gray-50 hover:bg-gray-100 transition rounded-xl px-4 py-3'>
+		<div className='col-span-2 font-semibold text-indigo-600'>#{rank}</div>
+		<div className='col-span-6 text-gray-900'>{email || "N/A"}</div>
+		<div className='col-span-4 text-right font-bold text-gray-800'>{score}</div>
+	</div>
+);
+
 const LeaderBoard = () => {
 	const [showModal, setShowModal] = useState(false);
-
-	const { user, API_BASE_URL } = useRecycleWise(); // Get the user from context	
+	const { user, API_BASE_URL } = useRecycleWise(); // Get the user from context
 	const [users, setUsers] = useState([]); // Initialize users state
+	const [loading, setLoading] = useState(true); // Loading state
+	const [error, setError] = useState(null); // Error state
 
 	useEffect(() => {
 		const getList = async () => {
+			setLoading(true); // Start loading
+			setError(null); // Reset error state
 			try {
-				const response = await axios.get(`${API_BASE_URL}/leaderboard`); // Fetch leaderboard data from the API
-				console.log(response); // Log the response data for debugging
+				const response = await axios.get(`${API_BASE_URL}/leaderboard`); // Fetch leaderboard data
+				if (response.status !== 200) {
+					throw new Error("Failed to fetch leaderboard data"); // Handle non-200 responses
+				}
+				// Check if the response is empty
+				console.log(response.data); // Log the response data for debugging
 				setUsers(response.data); // Set the users state with the fetched data
-			} catch (error) {
-				console.error("Error fetching leaderboard data:", error); // Handle any errors
+			} catch (err) {
+				console.error("Error fetching leaderboard data:", err);
+				setError("Failed to load leaderboard data."); // Set error message
+			} finally {
+				setLoading(false); // Stop loading
 			}
 		};
 		getList(); // Call the function to fetch data
-	}, []);
+	}, [API_BASE_URL]); // Add API_BASE_URL as a dependency
 
 	return (
 		<>
 			{/* Main Content */}
-
 			<div className='min-h-screen bg-gray-100 flex flex-col gap-6 items-center justify-center p-4'>
 				<div className='bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6'>
 					{/* Play the Game Button */}
-					{user ? ( // Check if user is authenticated
+					{user ? (
 						<div className='text-center mb-6'>
-							<p className='text-2xl text-gray-800 my-4'>Are you eco-savvy ?</p>
+							<p className='text-2xl text-gray-800 my-4'>Are you eco-savvy?</p>
 							<button
 								onClick={() => setShowModal(true)} // turn on the modal
 								className='bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition'
 							>
-								Take the Quiz ?!
+								Take the Quiz?!
 							</button>
 						</div>
 					) : (
@@ -63,22 +80,18 @@ const LeaderBoard = () => {
 						<div className='col-span-4 text-right'>Score</div>
 					</div>
 					<div className='mt-4 space-y-3'>
-						{users.map((elt, index) => (
-							<div
-								key={elt._id}
-								className='grid grid-cols-12 gap-4 items-center bg-gray-50 hover:bg-gray-100 transition rounded-xl px-4 py-3'
-							>
-								<div className='col-span-2 font-semibold text-indigo-600'>
-									#{index + 1}
-								</div>
-								<div className='col-span-6 text-gray-900'>
-									{elt.userId.email}
-								</div>
-								<div className='col-span-4 text-right font-bold text-gray-800'>
-									{elt.score}
-								</div>
-							</div>
-						))}
+						{loading ? (
+							<div className='text-center text-gray-500'>Loading...</div>
+						) : (
+							users.map((elt, index) => (
+								<LeaderBoardRow
+									key={elt._id}
+									rank={index + 1}
+									email={elt.userId?.email}
+									score={elt.score}
+								/>
+							))
+						)}
 					</div>
 				</div>
 			</div>

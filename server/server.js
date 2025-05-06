@@ -17,15 +17,9 @@ const app = express();
 const PORT = process.env.PORT || 5000; // Default to 5000 if PORT is not set
 const MODE = process.env.MODE || 'development'; // Default to 'development' if MODE is not set
 
-app.use(cors({
-  origin: process.env.CLIENT_ORIGIN, // Frontend URL
-  credentials: true               // ✅ Allow cookies to be sent with requests
-}));
-
-
+app.use(cors());
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 app.get('/', (req, res) => {
