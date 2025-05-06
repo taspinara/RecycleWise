@@ -35,10 +35,21 @@ const ProtectedRoute = ({ children }) => {
 const AdminRoute = ({ children }) => {
 	const { isAdmin } = useRecycleWise();
 
+	const { isAuthenticated } = useRecycleWise();
+
+	if (!isAuthenticated) {
+		return (
+			<Navigate
+				to='/login'
+				replace
+			/>
+		);
+	}
+
 	if (!isAdmin) {
 		return (
 			<Navigate
-				to='/'
+				to='/login'
 				replace
 			/>
 		);

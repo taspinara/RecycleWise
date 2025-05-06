@@ -1,72 +1,112 @@
-import { useState } from 'react';
-import { useRecycleWise } from '../context/RecycleWiseContext';
-import { apiFetch } from '../utils/api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRecycleWise } from "../context/RecycleWiseContext.jsx";
 
-export default function Register() {
-  const { setUser, navigate } = useRecycleWise();
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [error, setError] = useState('');
+const Register = () => {
+	const { API_BASE_URL } = useRecycleWise();
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+	const [formData, setFormData] = useState({
+		username: "",
+		email: "",
+		password: "",
+	});
+	const [error, setError] = useState("");
+	const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+	const handleInputChange = (e) => {
+		const { name, value } = e.target;
+		setFormData({ ...formData, [name]: value });
+	};
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			const response = await fetch(`${API_BASE_URL}/auth/register`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(formData),
+			});
 
-    try {
-      const { confirmPassword, ...requestData } = formData;
+			if (response.ok) {
+				navigate("/login"); // Redirect to login
+			} else {
+				const data = await response.json();
+				setError(data.message || "Registration failed");
+			}
+		} catch (err) {
+			setError(`An error occurred. Please try again: ${err.message}`);
+		}
+	};
 
-      const res = await apiFetch('/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(requestData),
-      });
+	return (
+		<div className='flex justify-center items-center h-screen bg-gray-100'>
+			<div className='bg-white p-8 rounded shadow-md w-full max-w-md'>
+				<h1 className='text-black text-2xl font-bold mb-6 text-center'>
+					Register
+				</h1>
+				{error && <p className='text-red-500 mb-4'>{error}</p>}
+				<form onSubmit={handleSubmit}>
+					<div className='mb-4'>
+						<label
+							htmlFor='username'
+							className='block text-gray-700 font-medium mb-2'
+						>
+							Username
+						</label>
+						<input
+							type='text'
+							id='username'
+							name='username'
+							value={formData.username}
+							onChange={handleInputChange}
+							className='text-black w-full border border-gray-300 p-2 rounded'
+							required
+						/>
+					</div>
+					<div className='mb-4'>
+						<label
+							htmlFor='email'
+							className='block text-gray-700 font-medium mb-2'
+						>
+							Email
+						</label>
+						<input
+							type='email'
+							id='email'
+							name='email'
+							value={formData.email}
+							onChange={handleInputChange}
+							className='text-black w-full border border-gray-300 p-2 rounded'
+							required
+						/>
+					</div>
+					<div className='mb-4'>
+						<label
+							htmlFor='password'
+							className='block text-gray-700 font-medium mb-2'
+						>
+							Password
+						</label>
+						<input
+							type='password'
+							id='password'
+							name='password'
+							value={formData.password}
+							onChange={handleInputChange}
+							className='text-black w-full border border-gray-300 p-2 rounded'
+							required
+						/>
+					</div>
+					<button
+						type='submit'
+						className='block text-center w-full bg-green-600 text-white py-2 rounded hover:bg-green-800'
+					>
+						Register
+					</button>
+				</form>
+			</div>
+		</div>
+	);
+};
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-
-      setUser(data.user);
-      navigate('/login');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
-  return (
-    <div className="flex justify-center items-center min-h-screen bg-base-200">
-      <form onSubmit={handleSubmit} className="card w-full max-w-md shadow-xl bg-base-100 p-8">
-        <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
-
-        <div className="grid grid-cols-2 gap-4">
-          <input name="firstName" type="text" placeholder="First Name" className="input input-bordered w-full" onChange={handleChange} required />
-          <input name="lastName" type="text" placeholder="Last Name" className="input input-bordered w-full" onChange={handleChange} required />
-        </div>
-
-        <input name="username" type="text" placeholder="Username" className="input input-bordered w-full mt-4" onChange={handleChange} required />
-        <input name="email" type="email" placeholder="Email" className="input input-bordered w-full mt-4" onChange={handleChange} required />
-        <input name="password" type="password" placeholder="Password" className="input input-bordered w-full mt-4" onChange={handleChange} required />
-        <input name="confirmPassword" type="password" placeholder="Confirm Password" className="input input-bordered w-full mt-4" onChange={handleChange} required />
-
-        {error && <p className="text-red-500 mt-2">{error}</p>}
-
-        <button type="submit" className="btn btn-primary w-full mt-6">Register</button>
-      </form>
-    </div>
-  );
-}
+export default Register;

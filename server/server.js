@@ -20,7 +20,7 @@ const MODE = process.env.MODE || 'development'; // Default to 'development' if M
 app.use(cors());
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.urlencoded({ extended: false })); // Parse URL-encoded bodies
 
 app.get('/', (req, res) => {
   res.send('Server is running');

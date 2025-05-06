@@ -10,7 +10,7 @@ const Login = () => {
 		password: "",
 	});
 
-	const { API_URL, setToken } = useRecycleWise();
+	const { API_BASE_URL, setToken } = useRecycleWise();
 
 	const navigate = useNavigate();
 
@@ -40,7 +40,7 @@ const Login = () => {
 
 		try {
 			// Connect to the backend API for login with axios
-			const response = await axios.post(`${API_URL}/auth/login`, formData, {
+			const response = await axios.post(`${API_BASE_URL}/auth/login`, formData, {
 				headers: { "Content-Type": "application/json" },
 			});
 			const data = response.data;

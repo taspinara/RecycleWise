@@ -1,22 +1,27 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import {jwtDecode} from "jwt-decode"; // Corrected import
 
 const RecycleWiseContext = createContext();
 
 export const RecycleWiseProvider = ({ children }) => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [isAdmin, setIsAdmin] = useState(false); // State to manage admin status
+	const [isAdmin, setIsAdmin] = useState(false);
 	const [user, setUser] = useState(null);
-	const [token, setToken] = useState(localStorage.getItem("token") || null); // State to store the token
+	const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-	const API_URL = import.meta.env.VITE_API_URL; // API URL from environment variables
+	const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 	const decodeToken = () => {
 		if (!token) return null;
 
 		try {
 			const decoded = jwtDecode(token);
-			return decoded; // Returns the payload (e.g., { id, username, email, role})
+			// Check if the token is expired
+			if (decoded.exp * 1000 < Date.now()) {
+				console.warn("Token has expired");
+				return null;
+			}
+			return decoded;
 		} catch (error) {
 			console.error("Invalid token:", error);
 			return null;
@@ -33,41 +38,46 @@ export const RecycleWiseProvider = ({ children }) => {
 				role: decoded.role,
 			});
 		} else {
-			setUser(null); // Reset user if token is invalid or expired
+			setUser(null);
 		}
 	}, [token]);
 
 	useEffect(() => {
-		setIsAuthenticated(!!token); // Set authentication status based on token
-	}, [token]);
-
-	useEffect(() => {
-		if (user) {
-			setIsAdmin(user.role === "admin"); // Set admin status based on user role
+		// Synchronize token with localStorage
+		if (token) {
+			localStorage.setItem("token", token);
 		} else {
-			setIsAdmin(false); // Reset admin status if user is null
+			localStorage.removeItem("token");
 		}
-	}, [user]);
+	}, [token]);
 
-	// Add any other state or functions you want to provide to your components
-	// For example, you might want to manage user authentication state, etc.
-	// const login = (userData) => setUser(userData);
-	// const logout = () => setUser(null);
-	// const isAuthenticated = !!user;
-	// const isAdmin = user?.role === 'admin'; // Example of checking if the user is an admin
+	useEffect(() => {
+		setIsAuthenticated(!!token);
+		setIsAdmin(user?.role === "admin");
+	}, [token, user]);
+
+	const logout = () => {
+		setToken(null);
+		setUser(null);
+		setIsAuthenticated(false);
+		setIsAdmin(false);
+	};
+
+	const contextValue = useMemo(
+		() => ({
+			isAuthenticated,
+			isAdmin,
+			token,
+			setToken,
+			user,
+			API_BASE_URL,
+			logout, // Provide logout function
+		}),
+		[isAuthenticated, isAdmin, token, user, API_BASE_URL]
+	);
 
 	return (
-		<RecycleWiseContext.Provider
-			value={{
-				isAuthenticated,
-				isAdmin, // Provide the isAdmin state
-				token,
-				setToken, // Function to update the token
-				user,
-				API_URL,
-				// Add any other context values you want to provide here
-			}}
-		>
+		<RecycleWiseContext.Provider value={contextValue}>
 			{children}
 		</RecycleWiseContext.Provider>
 	);

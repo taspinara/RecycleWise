@@ -9,6 +9,8 @@ const QuizModal = ({ onClose }) => {
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [questions, setQuestions] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null); // Error state for fetching questions
+	const [saving, setSaving] = useState(false); // Loading state for saving quiz results
 
 	const { API_BASE_URL, user, token } = useRecycleWise();
 	const SLICE_MAXIMUM = 20; // Maximum number of questions to slice from the API
@@ -16,25 +18,25 @@ const QuizModal = ({ onClose }) => {
 
 	useEffect(() => {
 		const fetchQuestions = async () => {
+			setLoading(true);
+			setError(null); // Reset error state
 			try {
 				const response = await axios.get(`${API_BASE_URL}/quiz`);
-				// Assuming the response contains the quiz data in the expected format
-				const startIndex = Math.floor(Math.random() * SLICE_MAXIMUM); // Randomly select a starting index between 0 and SLICE_MAXIMUM
-
-				const endIndex = startIndex + SLICE_LENGTH; // Get the next SLICE_LENGTH questions
-
-				setQuestions(response.data.slice(startIndex, endIndex)); // Uncomment this line if you want to fetch questions from the server
-			} catch (error) {
-				console.error("Error fetching quiz data:", error);
+				const startIndex = Math.floor(Math.random() * SLICE_MAXIMUM);
+				const endIndex = startIndex + SLICE_LENGTH;
+				setQuestions(response.data.slice(startIndex, endIndex));
+			} catch (err) {
+				console.error("Error fetching quiz data:", err);
+				setError("Failed to load quiz questions. Please try again.");
 			} finally {
 				setLoading(false);
 			}
 		};
 		fetchQuestions();
-	}, []);
+	}, [API_BASE_URL]);
 
 	const handleAnswer = (option) => {
-		const isCorrect = option === questions[currentQ].answer;
+		const isCorrect = option === questions[currentQ]?.answer;
 		if (isCorrect) setScore((prev) => prev + 1);
 
 		setIsAnimating(true);
@@ -56,30 +58,41 @@ const QuizModal = ({ onClose }) => {
 	};
 
 	const handleSave = async () => {
-		const userId = user.id; // Assuming you have the user ID from the context
+		setSaving(true);
+		setError(null); // Reset error state
+		const userId = user?.id; // Use optional chaining
 		const quizData = {
 			userId,
 			score: score * 10, // Assuming you want to save the score out of 100
 		};
 
-		await axios
-			.put(`${API_BASE_URL}/leaderboard`, quizData, {
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`, // Assuming you have the token in the context
-				},
-			})
-			.then((response) => {
-				console.log("Quiz result saved:", response.data);
-				onClose(); // Close the modal after saving
-			})
-			.catch((error) => {
-				console.error("Error saving quiz result:", error);
-			});
+		try {
+			const response = await axios.put(
+				`${API_BASE_URL}/leaderboard`,
+				quizData,
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				}
+			);
+			console.log("Quiz result saved:", response.data);
+			onClose(); // Close the modal after saving
+		} catch (err) {
+			console.error("Error saving quiz result:", err);
+			setError("Failed to save quiz results. Please try again.");
+		} finally {
+			setSaving(false);
+		}
 	};
 
 	return (
-		<div className='fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50'>
+		<div
+			className='fixed inset-0 bg-black/50 bg-opacity-40 flex items-center justify-center z-50'
+			aria-modal='true'
+			role='dialog'
+		>
 			<div
 				className='relative bg-white rounded-xl shadow-2xl w-[90%] max-w-md p-6 transition-transform duration-300 transform'
 				style={{
@@ -93,22 +106,25 @@ const QuizModal = ({ onClose }) => {
 						resetQuiz();
 						onClose();
 					}}
+					aria-label='Close quiz modal'
 				>
 					×
 				</button>
 				{loading ? (
 					<p className='text-center text-gray-600'>Loading questions...</p>
+				) : error ? (
+					<p className='text-center text-red-500'>{error}</p>
 				) : !showScore ? (
 					<>
 						<h2 className='text-xl font-semibold text-blue-800 mb-4'>
 							Question {currentQ + 1} of {questions.length}
 						</h2>
 						<p className='text-lg text-gray-800 mb-6'>
-							{questions[currentQ].question}
+							{questions[currentQ]?.question}
 						</p>
 
 						<div className='space-y-3'>
-							{questions[currentQ].options.map((option, index) => (
+							{questions[currentQ]?.options.map((option, index) => (
 								<button
 									key={index}
 									className='w-full bg-blue-100 hover:bg-blue-200 text-blue-900 font-medium py-2 px-4 rounded-lg transition duration-200'
@@ -128,6 +144,7 @@ const QuizModal = ({ onClose }) => {
 							You scored <span className='font-bold'>{score * 10}</span> out of{" "}
 							{questions.length * 10}.
 						</p>
+						{error && <p className='text-red-500 mb-4'>{error}</p>}
 						<div className='flex justify-center gap-4'>
 							<button
 								onClick={resetQuiz}
@@ -138,8 +155,9 @@ const QuizModal = ({ onClose }) => {
 							<button
 								onClick={handleSave}
 								className='bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-5 rounded-lg font-medium'
+								disabled={saving}
 							>
-								Save
+								{saving ? "Saving..." : "Save"}
 							</button>
 						</div>
 					</div>
