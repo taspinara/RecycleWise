@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {jwtDecode} from "jwt-decode"; // Corrected import
 
 const RecycleWiseContext = createContext();
@@ -10,6 +11,7 @@ export const RecycleWiseProvider = ({ children }) => {
 	const [token, setToken] = useState(localStorage.getItem("token") || null);
 
 	const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+	const navigate = useNavigate();
 
 	const decodeToken = () => {
 		if (!token) return null;
@@ -71,9 +73,10 @@ export const RecycleWiseProvider = ({ children }) => {
 			setToken,
 			user,
 			API_BASE_URL,
+			navigate,
 			logout, // Provide logout function
 		}),
-		[isAuthenticated, isAdmin, token, user, API_BASE_URL]
+		[isAuthenticated, isAdmin, token, user, API_BASE_URL, navigate]
 	);
 
 	return (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 import { useRecycleWise } from "../context/RecycleWiseContext";
@@ -10,10 +10,9 @@ const Login = () => {
 		password: "",
 	});
 
-	const { API_BASE_URL, setToken } = useRecycleWise();
+	const { API_BASE_URL, setToken, navigate } = useRecycleWise();
 
-	const navigate = useNavigate();
-
+	
 	const [error, setError] = useState("");
 
 	// Handle input changes

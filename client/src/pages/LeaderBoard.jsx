@@ -13,7 +13,7 @@ const LeaderBoardRow = ({ rank, email, score }) => (
 
 const LeaderBoard = () => {
 	const [showModal, setShowModal] = useState(false);
-	const { user, API_BASE_URL } = useRecycleWise(); // Get the user from context
+	const { user, API_BASE_URL, navigate } = useRecycleWise(); // Get the user from context
 	const [users, setUsers] = useState([]); // Initialize users state
 	const [loading, setLoading] = useState(true); // Loading state
 	const [error, setError] = useState(null); // Error state
@@ -40,6 +40,11 @@ const LeaderBoard = () => {
 		getList(); // Call the function to fetch data
 	}, [API_BASE_URL]); // Add API_BASE_URL as a dependency
 
+	// Go to login page if user is not authenticated
+	const handleLogin = () => {
+		navigate("/login"); // Redirect to login page
+	};
+
 	return (
 		<>
 			{/* Main Content */}
@@ -62,7 +67,7 @@ const LeaderBoard = () => {
 								Please login to play the game
 							</p>
 							<button
-								onClick={() => setShowModal(true)} // turn on the modal
+								onClick={handleLogin} // Redirect to login page
 								className='bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition'
 							>
 								Login
