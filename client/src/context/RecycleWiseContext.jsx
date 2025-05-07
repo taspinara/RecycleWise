@@ -1,55 +1,89 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from '../utils/api';
+import {jwtDecode} from "jwt-decode"; // Corrected import
 
 const RecycleWiseContext = createContext();
 
-export const useRecycleWise = () => useContext(RecycleWiseContext);
-
 export const RecycleWiseProvider = ({ children }) => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(false);
+	const [user, setUser] = useState(null);
+	const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  const fetchUser = async () => {
-    try {
-      const res = await apiFetch('/auth/me');
-      const data = await res.json();
-      if (res.ok) setUser(data);
-      else setUser(null);
-    } catch {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+	const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+	const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
+	const decodeToken = () => {
+		if (!token) return null;
 
-  const logout = async () => {
-    await apiFetch('/auth/logout', { method: 'POST' });
-    setUser(null);
-    navigate('/login');
-  };
+		try {
+			const decoded = jwtDecode(token);
+			// Check if the token is expired
+			if (decoded.exp * 1000 < Date.now()) {
+				console.warn("Token has expired");
+				return null;
+			}
+			return decoded;
+		} catch (error) {
+			console.error("Invalid token:", error);
+			return null;
+		}
+	};
 
-  const isAuthenticated = !!user;
-  const isAdmin = user?.role === "admin";
+	useEffect(() => {
+		const decoded = decodeToken();
+		if (decoded) {
+			setUser({
+				id: decoded.id,
+				username: decoded.username,
+				email: decoded.email,
+				role: decoded.role,
+			});
+		} else {
+			setUser(null);
+		}
+	}, [token]);
 
-  return (
-    <RecycleWiseContext.Provider
-      value={{
-        user,
-        setUser,
-        logout,
-        isAuthenticated,
-        isAdmin,
-        loading,
-        navigate,
-      }}
-    >
-      {!loading && children}
-    </RecycleWiseContext.Provider>
-  );
+	useEffect(() => {
+		// Synchronize token with localStorage
+		if (token) {
+			localStorage.setItem("token", token);
+		} else {
+			localStorage.removeItem("token");
+		}
+	}, [token]);
+
+	useEffect(() => {
+		setIsAuthenticated(!!token);
+		setIsAdmin(user?.role === "admin");
+	}, [token, user]);
+
+	const logout = () => {
+		setToken(null);
+		setUser(null);
+		setIsAuthenticated(false);
+		setIsAdmin(false);
+	};
+
+	const contextValue = useMemo(
+		() => ({
+			isAuthenticated,
+			isAdmin,
+			token,
+			setToken,
+			user,
+			API_BASE_URL,
+			navigate,
+			logout, // Provide logout function
+		}),
+		[isAuthenticated, isAdmin, token, user, API_BASE_URL, navigate]
+	);
+
+	return (
+		<RecycleWiseContext.Provider value={contextValue}>
+			{children}
+		</RecycleWiseContext.Provider>
+	);
 };
+
+export const useRecycleWise = () => useContext(RecycleWiseContext);
