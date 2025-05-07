@@ -14,7 +14,10 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import AuthenticatedUser from "./components/AuthenticatedUser";
 
-import { useRecycleWise } from "./context/RecycleWiseContext";
+import {
+	useRecycleWise,
+	RecycleWiseProvider,
+} from "./context/RecycleWiseContext";
 import Chatbot from "./components/Chatbot/Chatbot";
 
 const ProtectedRoute = ({ children }) => {
@@ -62,51 +65,53 @@ function App() {
 	return (
 		<div className='flex flex-col min-h-screen'>
 			<Router>
-				<Navbar />
-				<div className='flex-grow'>
-					<Routes>
-						<Route
-							index
-							element={<Home />}
-						/>
-						<Route
-							path='/events'
-							element={<Events />}
-						/>
-						<Route
-							path='/admin'
-							element={
-								<AdminRoute>
-									<Admin />
-								</AdminRoute>
-							}
-						/>
-						<Route
-							path='/leaderboard'
-							element={<LeaderBoard />}
-						/>
-						<Route
-							path='/login'
-							element={<Login />}
-						/>
-						<Route
-							path='/register'
-							element={<Register />}
-						/>
-						<Route
-							path='/recycling-tips'
-							element={<LeaderBoard />}
-						/>
-						<Route
-							path='/me'
-							element={<AuthenticatedUser />}
-						/>
-						{/* Add more routes as needed */}
-					</Routes>
-				</div>
-				<Footer />
-        <Chatbot />
-      </Router>
+				<RecycleWiseProvider>
+					<Navbar />
+					<div className='flex-grow'>
+						<Routes>
+							<Route
+								index
+								element={<Home />}
+							/>
+							<Route
+								path='/events'
+								element={<Events />}
+							/>
+							<Route
+								path='/admin'
+								element={
+									<AdminRoute>
+										<Admin />
+									</AdminRoute>
+								}
+							/>
+							<Route
+								path='/leaderboard'
+								element={<LeaderBoard />}
+							/>
+							<Route
+								path='/login'
+								element={<Login />}
+							/>
+							<Route
+								path='/register'
+								element={<Register />}
+							/>
+							<Route
+								path='/recycling-tips'
+								element={<LeaderBoard />}
+							/>
+							<Route
+								path='/me'
+								element={<AuthenticatedUser />}
+							/>
+							{/* Add more routes as needed */}
+						</Routes>
+					</div>
+					<Footer />
+					<Chatbot />
+				</RecycleWiseProvider>
+			</Router>
 		</div>
 	);
 }
