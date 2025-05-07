@@ -19,7 +19,8 @@
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.13.2"
+    "mongoose": "^8.13.2",
+    "openai": "^4.97.0"
   },
   "devDependencies": {
     "dotenv": "^16.4.7",
