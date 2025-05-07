@@ -15,10 +15,10 @@ import Register from "./components/Register";
 import AuthenticatedUser from "./components/AuthenticatedUser";
 
 import { useRecycleWise } from "./context/RecycleWiseContext";
+import Chatbot from "./components/Chatbot/Chatbot";
 
 const ProtectedRoute = ({ children }) => {
 	const { isAuthenticated } = useRecycleWise();
-
 	if (!isAuthenticated) {
 		return (
 			<Navigate
@@ -105,7 +105,8 @@ function App() {
 					</Routes>
 				</div>
 				<Footer />
-			</Router>
+        <Chatbot />
+      </Router>
 		</div>
 	);
 }
