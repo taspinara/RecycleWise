@@ -11,7 +11,6 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import errorHandler from './middleware/errorHandler.js';
 import aiRoutes from "./routes/aiRoutes.js"; // Import the AI route
-import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
 
