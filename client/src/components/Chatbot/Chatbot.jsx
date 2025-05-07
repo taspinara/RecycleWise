@@ -1,74 +1,116 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import ChatInput from "./ChatInput";
 import ChatHeader from "./ChatHeader";
 import ChatMessage from "./ChatMessage";
-import ChatInput from "./ChatInput";
 
-const Chatbot = () => {
-  const [chatOpen, setChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+const ChatBox = () => {
   const [inputMessage, setInputMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const toggleChat = () => setChatOpen(!chatOpen);
+  const toggleChat = () => setIsOpen((prev) => !prev);
 
-  const handleMessageSend = async (message) => {
-    if (!message) return;
+  const addMessage = (role, content, image = null) => {
+    setMessages((prev) => [...prev, { role, content, image }]);
+  };
 
-    const userMessage = { role: "user", content: message };
+  const handleTextSend = async () => {
+    if (!inputMessage.trim()) return;
+
+    const userMessage = inputMessage;
+    addMessage("user", userMessage);
     setInputMessage("");
 
     try {
-      const response = await fetch("http://localhost:8080/api/ai/ask", {
+      const res = await fetch(`${API_BASE_URL}/api/ai/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: message }),
+        body: JSON.stringify({ prompt: userMessage }),
       });
 
-      const data = await response.json();
-      const botMessage = { role: "bot", content: data.answer };
+      const data = await res.json();
+      addMessage("bot", data.answer);
+    } catch (err) {
+      console.error(err);
+      addMessage("bot", "Error: Failed to get response");
+    }
+  };
 
-      setMessages((prevMessages) => [...prevMessages, userMessage, botMessage]);
-    } catch (error) {
-      console.error("Error:", error);
-      const botErrorMessage = {
-        role: "bot",
-        content: "Error: Something went wrong",
-      };
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        userMessage,
-        botErrorMessage,
-      ]);
+  const handleImageSend = async (imageFile) => {
+    const imageUrl = URL.createObjectURL(imageFile);
+    addMessage("user", "", imageUrl);
+
+    const formData = new FormData();
+    formData.append("image", imageFile);
+    formData.append("prompt", "Is this item recyclable?");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/ai/ask-image`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      addMessage("bot", data.answer);
+    } catch (err) {
+      console.error(err);
+      addMessage("bot", "Error: Failed to analyze image");
     }
   };
 
   return (
-    <div className="relative">
-      {!chatOpen && (
+    <>
+      {/* Button to open chat */}
+      {!isOpen && (
         <button
-          className="fixed bottom-5 right-5 p-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700"
           onClick={toggleChat}
+          className="fixed bottom-6 right-6 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-700 z-50"
         >
           RecycleWise Chatbot
         </button>
       )}
 
-      {chatOpen && (
-        <div className="fixed bottom-20 right-5 w-80 bg-white rounded-lg shadow-lg max-h-[500px] flex flex-col">
+      {/* Chatbox container */}
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 w-full max-w-md h-[550px] flex flex-col bg-white rounded-lg shadow-lg z-50">
           <ChatHeader toggleChat={toggleChat} />
-          <div className="flex-grow p-4 overflow-y-auto space-y-2">
-            {messages.map((msg, index) => (
-              <ChatMessage key={index} message={msg} />
+
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50">
+            {messages.map((msg, i) => (
+              <div key={i}>
+                <ChatMessage message={msg} />
+                {msg.image && (
+                  <div
+                    className={`mt-2 ${
+                      msg.role === "user"
+                        ? "flex justify-end"
+                        : "flex justify-start"
+                    }`}
+                  >
+                    <img
+                      src={msg.image}
+                      alt="Uploaded"
+                      className="max-w-[70%] rounded-xl shadow"
+                    />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
-          <ChatInput
-            inputMessage={inputMessage}
-            setInputMessage={setInputMessage}
-            handleMessageSend={handleMessageSend}
-          />
+
+          <div className="p-3 border-t">
+            <ChatInput
+              inputMessage={inputMessage}
+              setInputMessage={setInputMessage}
+              handleTextSend={handleTextSend}
+              handleImageSend={handleImageSend}
+            />
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-export default Chatbot;
+export default ChatBox;
