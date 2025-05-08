@@ -15,7 +15,7 @@ const Events = () => {
 			setLoading(true);
 			setError(null);
 			try {
-				const response = await axios.get(`${API_BASE_URL}/events`);
+				const response = await axios.get(`${API_BASE_URL}/api/events`);
 				setEvents(response.data);
 				setFilteredEvents(response.data);
 			} catch (err) {

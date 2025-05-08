@@ -21,15 +21,7 @@ const Footer = () => {
 						>
 							About Us
 						</a>
-					</li>
-					<li className='inline-block mx-2'>
-						<a
-							href='#services'
-							className='hover:underline'
-						>
-							Services
-						</a>
-					</li>
+					</li>	
 					<li className='inline-block mx-2'>
 						<a
 							href='#contact'

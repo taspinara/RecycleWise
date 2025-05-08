@@ -19,7 +19,7 @@ import {
   RecycleWiseProvider,
 } from "./context/RecycleWiseContext";
 import Chatbot from "./components/Chatbot/Chatbot";
-import SpeedometerDashboard from "./components/Speedometer";
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useRecycleWise();
@@ -73,7 +73,7 @@ function App() {
               {/* Add more routes as needed */}
             </Routes>
           </div>
-          <SpeedometerDashboard />
+         
           <Footer />
           <Chatbot />
         </RecycleWiseProvider>

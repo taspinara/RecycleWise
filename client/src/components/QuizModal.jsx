@@ -21,7 +21,7 @@ const QuizModal = ({ onClose }) => {
 			setLoading(true);
 			setError(null); // Reset error state
 			try {
-				const response = await axios.get(`${API_BASE_URL}/quiz`);
+				const response = await axios.get(`${API_BASE_URL}/api/quiz`);
 				const startIndex = Math.floor(Math.random() * SLICE_MAXIMUM);
 				const endIndex = startIndex + SLICE_LENGTH;
 				setQuestions(response.data.slice(startIndex, endIndex));
