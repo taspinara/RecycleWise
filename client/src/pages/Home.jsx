@@ -98,8 +98,7 @@ const Home = () => {
 					<div className='bg-[#E5EED7] p-6 rounded-lg shadow-md'>
 						<h2 className='text-green-600 text-2xl font-bold'>Get Started</h2>
 						<p className='text-gray-800'>
-							Lorem, ipsum dolor sit amet consectetur adipisicing elit. In,
-							odit!
+							Recycling one aluminium can saves enough energy to run a TV for 3 hours.
 						</p>
 						<Link
 							to='/contact-us'

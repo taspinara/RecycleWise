@@ -5,14 +5,11 @@ import { Link } from "react-router-dom";
 import { useRecycleWise } from "../context/RecycleWiseContext.jsx"; // Adjust the import based on your context structure
 
 const Navbar = () => {
-	const { isAuthenticated, user, navigate } = useRecycleWise();
+	const { isAuthenticated, user, navigate, logout } = useRecycleWise();
 
 	const handleLogout = () => {
-		localStorage.removeItem("token");
-		navigate("/login"); // Redirect to login page
-		// Or you can use window.location.href to redirect to the home page	
-		//window.location.href = "/"; // Redirect to home page		
-		//window.location.reload(); // Reload the page to reflect the changes
+		logout(); // Call the logout function from the context
+		navigate("/"); 
 	};
 
 	return (

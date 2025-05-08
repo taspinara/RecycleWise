@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import QuizModal from "../components/QuizModal";
 import { useRecycleWise } from "../context/RecycleWiseContext.jsx";
 import axios from "axios";
@@ -17,7 +18,7 @@ const LeaderBoard = () => {
 	const [users, setUsers] = useState([]); // Initialize users state
 	const [loading, setLoading] = useState(true); // Loading state
 	const [error, setError] = useState(null); // Error state
-
+	const location = useLocation(); // Get the current location
 	useEffect(() => {
 		const getList = async () => {
 			setLoading(true); // Start loading
@@ -42,7 +43,7 @@ const LeaderBoard = () => {
 
 	// Go to login page if user is not authenticated
 	const handleLogin = () => {
-		navigate("/login"); // Redirect to login page
+		navigate("/login", { state: { from: location } });
 	};
 
 	return (

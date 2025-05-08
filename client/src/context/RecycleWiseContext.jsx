@@ -63,6 +63,7 @@ export const RecycleWiseProvider = ({ children }) => {
 		setUser(null);
 		setIsAuthenticated(false);
 		setIsAdmin(false);
+		localStorage.removeItem("token"); // Remove token from localStorage
 	};
 
 	const contextValue = useMemo(
