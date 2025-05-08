@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 import { useRecycleWise } from "../context/RecycleWiseContext";
@@ -9,7 +9,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-
+  const location = useLocation();
   const { API_BASE_URL, setToken, navigate } = useRecycleWise();
 
   const [error, setError] = useState("");
@@ -27,30 +27,27 @@ const Login = () => {
     setError(""); // Reset error message
 
     if (!formData.email || !formData.password) {
-      setError("Please fill in all fields");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
-    }
+			setError("Please fill in all fields");
+			return;
+		}
 
     try {
-      // Connect to the backend API for login with axios
-      const response = await axios.post(
-        `${API_BASE_URL}/api/auth/login`,
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const data = response.data;
-      localStorage.setItem("token", data.token); // Save token
-      setToken(data.token); // Update context state
+			// Connect to the backend API for login with axios
+			const response = await axios.post(
+				`${API_BASE_URL}/api/auth/login`,
+				formData,
+				{
+					headers: { "Content-Type": "application/json" },
+				}
+			);
+			const data = response.data;
+			localStorage.setItem("token", data.token); // Save token
+			setToken(data.token); // Update context state
 
-      navigate("/"); // Redirect to home
-    } catch (err) {
+			// Redirect to the last page or home if no previous page
+			const redirectPath = location.state?.from?.pathname || "/";
+			navigate(redirectPath);
+		} catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
   };

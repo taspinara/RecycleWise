@@ -1,8 +1,9 @@
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
+	BrowserRouter as Router,
+	Routes,
+	Route,
+	Navigate,
+	useLocation,
 } from "react-router-dom";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
@@ -15,37 +16,53 @@ import Register from "./components/Register";
 import AuthenticatedUser from "./components/AuthenticatedUser";
 import Posts from "./pages/Posts";
 import {
-  useRecycleWise,
-  RecycleWiseProvider,
+	useRecycleWise,
+	RecycleWiseProvider,
 } from "./context/RecycleWiseContext";
 import Chatbot from "./components/Chatbot/Chatbot";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useRecycleWise();
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+	const { isAuthenticated } = useRecycleWise();
+	if (!isAuthenticated) {
+		return (
+			<Navigate
+				to='/login'
+				replace
+			/>
+		);
+	}
 
-  return children;
+	return children;
 };
 
 // Admin route to be protected
 const AdminRoute = ({ children }) => {
-  const { isAdmin } = useRecycleWise();
+	const { isAdmin } = useRecycleWise();
 
-  const { isAuthenticated } = useRecycleWise();
+	const { isAuthenticated } = useRecycleWise();
+	const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+	if (!isAuthenticated) {
+		return (
+			<Navigate
+				to='/login'
+				state={{ from: location }}
+			/>
+		);
+	}
 
-  if (!isAdmin) {
-    return <Navigate to="/login" replace />;
-  }
+	if (!isAdmin) {
+		return (
+			<Navigate
+				to='/login'
+				state={{ from: location }}
+			/>
+		);
+	}
 
-  return children;
+	return children;
 };
 
 function App() {
