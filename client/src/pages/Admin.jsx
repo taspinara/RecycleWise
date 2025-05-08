@@ -23,7 +23,7 @@ const Admin = () => {
 	useEffect(() => {
 		const fetchEvents = async () => {
 			try {
-				const response = await axios.get(`${API_BASE_URL}/events`);
+				const response = await axios.get(`${API_BASE_URL}/api/events`);
 				if (response.status !== 200) {
 					throw new Error("Failed to fetch leaderboard data"); // Handle non-200 responses
 				}
@@ -49,8 +49,8 @@ const Admin = () => {
 		e.preventDefault();
 		const method = editingEventId ? "PUT" : "POST";
 		const url = editingEventId
-			? `${API_BASE_URL}/events/${editingEventId}`
-			: `${API_BASE_URL}/events`;
+			? `${API_BASE_URL}/api/events/${editingEventId}`
+			: `${API_BASE_URL}/api/events`;
 
 		const response = await fetch(url, {
 			method,
@@ -87,7 +87,7 @@ const Admin = () => {
 
 	// Handle delete event
 	const handleDelete = async (id) => {
-		const response = await fetch(`/api/events/${id}`, { method: "DELETE", 
+		const response = await fetch(`${API_BASE_URL}/api/events/${id}`, { method: "DELETE", 
 					headers: {
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${token}`,

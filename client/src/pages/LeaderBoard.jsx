@@ -23,7 +23,7 @@ const LeaderBoard = () => {
 			setLoading(true); // Start loading
 			setError(null); // Reset error state
 			try {
-				const response = await axios.get(`${API_BASE_URL}/leaderboard`); // Fetch leaderboard data
+				const response = await axios.get(`${API_BASE_URL}/api/leaderboard`); // Fetch leaderboard data
 				if (response.status !== 200) {
 					throw new Error("Failed to fetch leaderboard data"); // Handle non-200 responses
 				}

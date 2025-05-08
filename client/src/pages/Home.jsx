@@ -8,7 +8,7 @@ import {
 	FaQuestionCircle,
 	FaCalendarCheck,
 } from "react-icons/fa";
-
+import SpeedometerDashboard from "../components/Speedometer";
 import { useRecycleWise } from "../context/RecycleWiseContext";
 
 const Home = () => {
@@ -26,7 +26,7 @@ const Home = () => {
 						Join us in creating a sustainable future by recycling smarter.
 					</p>
 					<Link
-						to='/'
+						to='/login'
 						className='bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700'
 					>
 						Get Started
@@ -59,7 +59,7 @@ const Home = () => {
 							</p>
 						</div>
 					</Link>
-					<Link to='/eco-friendly'>
+					<Link to='/posts'>
 						<div className='flex flex-col text-center items-center bg-[#E5EED7] p-6 rounded-lg shadow-md'>
 							<FaCamera className='text-[#B1C49A] text-6xl mb-4' />
 							<h4 className='text-xl font-bold text-gray-800 mb-2'>
@@ -117,6 +117,7 @@ const Home = () => {
 					/>
 				</div>
 			</section>
+			<SpeedometerDashboard />
 		</div>
 	);
 };
