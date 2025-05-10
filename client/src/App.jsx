@@ -6,6 +6,7 @@ import {
 	useLocation,
 } from "react-router-dom";
 import Home from "./pages/Home";
+import AboutUs from './pages/AboutUs';
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import LeaderBoard from "./pages/LeaderBoard";
@@ -74,6 +75,7 @@ function App() {
           <div className="flex-grow">
             <Routes>
               <Route index element={<Home />} />
+			  <Route path="/about-us" element={<AboutUs />} />
               <Route path="/events" element={<Events />} />
               <Route
                 path="/admin"
