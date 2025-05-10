@@ -44,12 +44,12 @@ const Navbar = () => {
 								</Link>
 							</li>
 							<li>
-								<a
-									href='#contact'
-									className='hover:underline'
+								<Link 
+									to="/contact-us" 
+									className="hover:underline"
 								>
 									Contact
-								</a>
+								</Link>
 							</li>
 							{user && (
 								<>
