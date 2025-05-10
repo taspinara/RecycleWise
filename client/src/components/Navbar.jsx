@@ -28,12 +28,12 @@ const Navbar = () => {
 					<nav>
 						<ul className='flex space-x-6'>
 							<li>
-								<a
-									href='#about'
+								<Link
+									to='/about-us'
 									className='hover:underline'
 								>
 									About Us
-								</a>
+								</Link>
 							</li>
 							<li>
 								<Link
@@ -44,12 +44,12 @@ const Navbar = () => {
 								</Link>
 							</li>
 							<li>
-								<a
-									href='#contact'
-									className='hover:underline'
+								<Link 
+									to="/contact-us" 
+									className="hover:underline"
 								>
 									Contact
-								</a>
+								</Link>
 							</li>
 							{user && (
 								<>
