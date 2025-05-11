@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import LeaderBoard from "./pages/LeaderBoard";
@@ -76,6 +77,7 @@ function App() {
             <Routes>
               <Route index element={<Home />} />
 			  <Route path="/about-us" element={<AboutUs />} />
+			  <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/events" element={<Events />} />
               <Route
                 path="/admin"
