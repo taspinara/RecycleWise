@@ -9,12 +9,9 @@ import {
   FaCalendarCheck,
 } from "react-icons/fa";
 import SpeedometerDashboard from "../components/Speedometer";
-import { useRecycleWise } from "../context/RecycleWiseContext";
 import Typed from "typed.js"; // Import Typed.js
 
 const Home = () => {
-  const { user } = useRecycleWise(); // Access user from context
-  console.log("User", user); // Log when the component is rendered
   const typedRef = useRef(null);
   const typedInstance = useRef(null);
 
