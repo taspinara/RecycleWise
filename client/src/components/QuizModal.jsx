@@ -68,7 +68,7 @@ const QuizModal = ({ onClose }) => {
 
 		try {
 			const response = await axios.put(
-				`${API_BASE_URL}/leaderboard`,
+				`${API_BASE_URL}/api/leaderboard`,
 				quizData,
 				{
 					headers: {
