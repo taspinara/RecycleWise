@@ -6,6 +6,10 @@ const postSchema = new Schema(
       type: String,
       required: [true, "Text is required"],
     },
+    content: {
+      type: String,
+      required: [true, "Content is required"],
+    },
     image: {
       type: String,
       default:

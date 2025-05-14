@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRecycleWise } from "../context/RecycleWiseContext.jsx";
+import { motion } from "framer-motion";
 
 function Posts() {
   const { API_BASE_URL, user, isLoading } = useRecycleWise();
@@ -10,22 +11,16 @@ function Posts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const hasWarned = useRef(false);
 
   useEffect(() => {
-    // Wait for the user to be loaded properly from context
-    if (isLoading) return; // Prevent the effect from running if the user is still loading
+    if (isLoading) return;
 
     if (!user) {
-      if (!hasWarned.current) {
-        toast.info("Please log in or create an account to view posts.", {
-          position: "top-center",
-          autoClose: 3000,
-        });
-        hasWarned.current = true;
-
-        navigate("/login");
-      }
+      toast.info("Please log in or create an account to view posts.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      navigate("/login");
       return;
     }
 
@@ -54,39 +49,45 @@ function Posts() {
   if (isLoading || loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
+  // Sort posts from newest to oldest by createdAt
+  const sortedPosts = [...posts].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
   return (
-    <div>
-      <h2 className=" text-center my-10 font-bold text-gray-800 text-3xl">
-        Posts
+    <div className="posts-container">
+      <h2 className="text-center my-10 font-bold text-gray-800 text-3xl">
+        Recycling Blog
       </h2>
-      {posts.length === 0 ? (
+      {sortedPosts.length === 0 ? (
         <p className="text-green-600">No posts available.</p>
       ) : (
-        posts.map((post) => (
-          <div
-            key={post?._id}
-            className="post-container bg-white shadow-lg rounded-lg p-6 mb-6 max-w-3xl mx-auto"
-          >
-            <div className="post-image mb-4">
-              <img
-                src={post?.image}
-                alt="Post"
-                className="rounded-lg w-full h-auto"
-                style={{ maxHeight: "400px", objectFit: "cover" }}
-              />
-            </div>
-            <div className="post-content">
-              <h2 className="text-2xl font-semibold text-green-600 mb-3">
-                {post?.text}
-              </h2>
-              <p className="text-gray-600 mb-4">{post?.description}</p>
-              <div className="post-footer flex justify-between items-center text-sm text-gray-500">
-                <span>Posted by {post?.user.username}</span>
-                <span>{new Date(post?.createdAt).toLocaleString()}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedPosts.map((post) => (
+            <motion.div
+              key={post?._id}
+              className="post-container cursor-pointer bg-white shadow-lg rounded-lg p-6 mb-6"
+              onClick={() => navigate(`/posts/${post._id}`)}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="post-image mb-4">
+                <img
+                  src={post?.image}
+                  alt="Post"
+                  className="rounded-lg w-full h-auto"
+                  style={{ maxHeight: "400px", objectFit: "cover" }}
+                />
               </div>
-            </div>
-          </div>
-        ))
+              <div className="post-content">
+                <h2 className="text-2xl font-semibold text-green-600 mb-3">
+                  {post?.text}
+                </h2>
+                <p className="text-gray-600 mb-4">{post?.content}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       )}
     </div>
   );
