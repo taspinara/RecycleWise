@@ -1,14 +1,14 @@
 import {
-	BrowserRouter as Router,
-	Routes,
-	Route,
-	Navigate,
-	useLocation,
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import AboutUs from './pages/AboutUs';
-import ContactUs from './pages/ContactUs';
-import RecycleMap from './pages/RecycleMap';
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import RecycleMap from "./pages/RecycleMap";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import LeaderBoard from "./pages/LeaderBoard";
@@ -18,54 +18,40 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import AuthenticatedUser from "./components/AuthenticatedUser";
 import Posts from "./pages/Posts";
+import PostDetail from "./pages/PostDetail";
 import {
-	useRecycleWise,
-	RecycleWiseProvider,
+  useRecycleWise,
+  RecycleWiseProvider,
 } from "./context/RecycleWiseContext";
 import Chatbot from "./components/Chatbot/Chatbot";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProtectedRoute = ({ children }) => {
-	const { isAuthenticated } = useRecycleWise();
-	if (!isAuthenticated) {
-		return (
-			<Navigate
-				to='/login'
-				replace
-			/>
-		);
-	}
+  const { isAuthenticated } = useRecycleWise();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-	return children;
+  return children;
 };
 
 // Admin route to be protected
 const AdminRoute = ({ children }) => {
-	const { isAdmin } = useRecycleWise();
+  const { isAdmin } = useRecycleWise();
 
-	const { isAuthenticated } = useRecycleWise();
-	const location = useLocation();
+  const { isAuthenticated } = useRecycleWise();
+  const location = useLocation();
 
-	if (!isAuthenticated) {
-		return (
-			<Navigate
-				to='/login'
-				state={{ from: location }}
-			/>
-		);
-	}
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} />;
+  }
 
-	if (!isAdmin) {
-		return (
-			<Navigate
-				to='/login'
-				state={{ from: location }}
-			/>
-		);
-	}
+  if (!isAdmin) {
+    return <Navigate to="/login" state={{ from: location }} />;
+  }
 
-	return children;
+  return children;
 };
 
 function App() {
@@ -77,9 +63,9 @@ function App() {
           <div className="flex-grow">
             <Routes>
               <Route index element={<Home />} />
-			  <Route path="/about-us" element={<AboutUs />} />
-			  <Route path="/contact-us" element={<ContactUs />} />
-			  <Route path="/recycling-locator" element={<RecycleMap />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/recycling-locator" element={<RecycleMap />} />
               <Route path="/events" element={<Events />} />
               <Route
                 path="/admin"
@@ -95,6 +81,7 @@ function App() {
               <Route path="/recycling-tips" element={<LeaderBoard />} />
               <Route path="/me" element={<AuthenticatedUser />} />
               <Route path="/posts" element={<Posts />} />
+              <Route path="/posts/:id" element={<PostDetail />} />
               {/* Add more routes as needed */}
             </Routes>
           </div>
